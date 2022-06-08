@@ -1,0 +1,17 @@
+[package]
+name = "ctrl-cidr"
+authors = ["LOU Xun <xun.lou@controlant.com>"]
+description = "CIDR rules controller for AWS networking"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+aws-config = "0.12"
+aws-sdk-ec2 = "0.12"
+aws-sdk-eks = "0.12"
+tokio = { version = "1", features = ["full"] }
+ipnet = "2"
+clap = { version = "3", default-features = false, features = ["std", "derive"] }
+log = "0.4"
+env_logger = "0.9"
