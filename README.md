@@ -20,4 +20,4 @@ The name is also a pun on [our company name](https://controlant.com/).
 - TODO: allow specify protocol
 - MAYBE: support ipv6
 - TODO: metrics
-- MAYBE: use distributed tracing
+- MAYBE: use distributed tracing (probably helps with async as well)

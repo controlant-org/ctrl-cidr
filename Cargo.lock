@@ -454,6 +454,7 @@ dependencies = [
  "aws-config",
  "aws-sdk-ec2",
  "aws-sdk-eks",
+ "aws-types",
  "clap",
  "env_logger",
  "ipnet",

@@ -6,8 +6,14 @@ use std::collections::HashMap;
 #[clap(author, version, about)]
 struct Cli {
   /// CIDR maps, format is [name]=[cidr], repeat to provide multiple mappings, cidrs with the same name will be grouped together, name cannot contain colon (:)
-  #[clap(long, short, parse(try_from_str = parse_key_val))]
+  #[clap(long, short, parse(try_from_str = parse_key_val), min_values(1))]
   cidr: Vec<(String, Ipv4Net)>,
+  /// AWS IAM roles to assume, repeat to list all accounts to manage. If not specified, simply loads the current environment/account.
+  #[clap(long, short)]
+  assume: Option<Vec<String>>,
+  /// Read and generate modification actions but do not actually execute them
+  #[clap(long)]
+  dry_run: bool,
   /// The tag "key" to use for ingress rules, used for all resources
   #[clap(long, short, default_value = "ingress.controlant.com")]
   ingress_key: String,
@@ -16,9 +22,12 @@ struct Cli {
   egress_key: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct App {
   pub cidrs: HashMap<String, Vec<Ipv4Net>>,
+  pub assume_roles: Option<Vec<String>>,
+  pub dry_run: bool,
   pub ingress_sources: String,
   pub ingress_ports: String,
   pub egress_sources: String,
@@ -34,6 +43,8 @@ impl App {
     });
     Self {
       cidrs,
+      assume_roles: cli.assume,
+      dry_run: cli.dry_run,
       ingress_sources: format!("{}/sources", cli.ingress_key),
       ingress_ports: format!("{}/ports", cli.ingress_key),
       egress_sources: format!("{}/sources", cli.egress_key),
