@@ -6,7 +6,7 @@ use std::collections::HashMap;
 #[clap(author, version, about)]
 struct Cli {
   /// CIDR maps, format is [name]=[cidr], repeat to provide multiple mappings, cidrs with the same name will be grouped together, name cannot contain colon (:)
-  #[clap(long, short, parse(try_from_str = parse_key_val), min_values(1))]
+  #[clap(long, short, parse(try_from_str = parse_key_val), required(true))]
   cidr: Vec<(String, Ipv4Net)>,
   /// AWS IAM roles to assume, repeat to list all accounts to manage. If not specified, simply loads the current environment/account.
   #[clap(long, short)]
