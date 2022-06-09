@@ -7,11 +7,16 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1"
-aws-config = "0.12"
-aws-sdk-ec2 = "0.12"
-aws-sdk-eks = "0.12"
-tokio = { version = "1", features = ["full"] }
-ipnet = "2"
 clap = { version = "3", default-features = false, features = ["std", "derive"] }
 log = "0.4"
 env_logger = "0.9"
+ipnet = "2"
+
+# AWS
+aws-config = "0.12"
+aws-sdk-ec2 = "0.12"
+aws-sdk-eks = "0.12"
+
+# Runtime
+tokio = { version = "1", features = ["full"] }
+tokio-stream = "0.1"

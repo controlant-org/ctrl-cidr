@@ -14,5 +14,10 @@ The name is also a pun on [our company name](https://controlant.com/).
 # Roadmap
 
 - TODO: use assumerole to manage multiple accounts
+- MAYBE: manage VPC ACLs
+- TODO: make into a long-running service
 - TODO: keep a "statefile" for cleanup purpose
+- TODO: allow specify protocol
 - MAYBE: support ipv6
+- TODO: metrics
+- MAYBE: use distributed tracing

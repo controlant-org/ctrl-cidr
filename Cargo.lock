@@ -459,6 +459,7 @@ dependencies = [
  "ipnet",
  "log",
  "tokio",
+ "tokio-stream",
 ]
 
 [[package]]
