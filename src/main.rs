@@ -10,12 +10,13 @@ async fn main() -> Result<()> {
   let app = cli::App::from_cli();
   trace!("loaded app config: {:?}", &app);
 
+  let base_aws_config = aws_config::load_from_env().await;
+
   if let Some(ref assume_roles) = app.assume_roles {
     trace!("assume roles: {:?}", assume_roles);
 
     use aws_config::default_provider::credentials::DefaultCredentialsChain;
     use aws_config::sts::AssumeRoleProvider;
-    use aws_types::region::Region;
     use std::sync::Arc;
 
     let tasks: Vec<_> = assume_roles
@@ -23,11 +24,12 @@ async fn main() -> Result<()> {
       .map(|role| {
         let role = role.clone();
         let app = app.clone();
+        let region = base_aws_config.region().unwrap().clone();
 
         tokio::spawn(async move {
           let provider = AssumeRoleProvider::builder(role)
             .session_name("ctrl-cidr")
-            .region(Region::new("eu-central-1"))
+            .region(region)
             .build(Arc::new(DefaultCredentialsChain::builder().build().await) as Arc<_>);
 
           let config = aws_config::from_env().credentials_provider(provider).load().await;
@@ -40,8 +42,7 @@ async fn main() -> Result<()> {
       t.await?;
     }
   } else {
-    let config = aws_config::load_from_env().await;
-    controller::run(&config, &app).await?;
+    controller::run(&base_aws_config, &app).await?;
   }
 
   Ok(())
