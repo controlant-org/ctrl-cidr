@@ -2,7 +2,7 @@
 name = "ctrl-cidr"
 authors = ["LOU Xun <xun.lou@controlant.com>"]
 description = "CIDR rules controller for AWS networking"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 
 [dependencies]
