@@ -11,12 +11,9 @@ struct Cli {
   /// AWS IAM roles to assume, repeat to list all accounts to manage. If not specified, simply loads the current environment/account.
   #[clap(long, short)]
   assume: Option<Vec<String>>,
-  /// The tag "key" to use for ingress rules, used for all resources
+  /// The tag "key" to use for ingress rules
   #[clap(long, short, default_value = "ingress.controlant.com")]
   ingress_key: String,
-  /// The tag "key" to use for egress rules, only for Security Groups
-  #[clap(long, short, default_value = "egress.controlant.com")]
-  egress_key: String,
   /// Read and generate modification actions but do not actually execute them
   #[clap(long)]
   dry_run: bool,
@@ -32,8 +29,8 @@ pub struct App {
   pub assume_roles: Option<Vec<String>>,
   pub ingress_sources: String,
   pub ingress_ports: String,
-  pub egress_sources: String,
-  pub egress_ports: String,
+  // pub egress_sources: String,
+  // pub egress_ports: String,
   pub dry_run: bool,
   pub once: bool,
 }
@@ -50,8 +47,8 @@ impl App {
       assume_roles: cli.assume,
       ingress_sources: format!("{}/sources", cli.ingress_key),
       ingress_ports: format!("{}/ports", cli.ingress_key),
-      egress_sources: format!("{}/sources", cli.egress_key),
-      egress_ports: format!("{}/ports", cli.egress_key),
+      // egress_sources: format!("{}/sources", cli.egress_key),
+      // egress_ports: format!("{}/ports", cli.egress_key),
       dry_run: cli.dry_run,
       once: cli.once,
     }
