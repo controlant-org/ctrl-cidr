@@ -21,4 +21,4 @@ jobs:
         git add Cargo.toml
         git commit -m "Release ${{ inputs.version }}"
         git tag ${{ inputs.version }}
-        git push ${{ inputs.version }}
+        git push --atomic origin master ${{ inputs.version }}
