@@ -26,12 +26,12 @@ The name is also a pun on [our company name](https://controlant.com/).
 
 - Run `ctrl-cidr --cidr office=1.2.3.4/32 --cidr vpn 5.6.7.8/32 --ingress_key ingress`
 - Add tag `ingress/sources` with value `office:vpn` to a Security Group
-- Add tag `ingress/ports` with value `443/tcp:4567/-1` to the same Security Group
+- Add tag `ingress/ports` with value `443:4567/-1` to the same Security Group
 - The controller will maintain following rules for the Security Group:
-  - ingress from `1.2.3.4/32` on port `443` with protocol `tcp`
+  - ingress from `1.2.3.4/32` on port `443` with protocol `tcp` (default)
   - ingress from `1.2.3.4/32` on port `4567` with protocol `-1` (all protocols)
   - ingress from `5.6.7.8/32` on port `443` with protocol `tcp`
-  - ingress from `5.6.7.8/32` on port `4567` with protocol `-1` (all protocols)
+  - ingress from `5.6.7.8/32` on port `4567` with protocol `-1`
 
 # Roadmap
 
