@@ -1,8 +1,8 @@
 [package]
 name = "ctrl-cidr"
+version = "0.3.0"
 authors = ["LOU Xun <xun.lou@controlant.com>"]
 description = "CIDR rules controller for AWS networking"
-version = "0.3.0"
 edition = "2021"
 
 [dependencies]
