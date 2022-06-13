@@ -6,7 +6,8 @@ use std::collections::HashMap;
 #[clap(author, version, about)]
 struct Cli {
   /// CIDR maps, format is [name]=[cidr], repeat to provide multiple mappings, cidrs with the same name will be grouped together, name cannot contain colon (:)
-  #[clap(long, short, parse(try_from_str = parse_key_val), required(true))]
+  // TODO: allow no cidr, thus the controller only handles cleanup
+  #[clap(long, short, parse(try_from_str = parse_key_val), required(true), value_name="[name]=[cidr]")]
   cidr: Vec<(String, Ipv4Net)>,
   /// AWS IAM roles to assume, repeat to list all accounts to manage. If not specified, simply loads the current environment/account.
   #[clap(long, short)]
@@ -20,6 +21,9 @@ struct Cli {
   /// Run controller logic just once, instead of running as a service
   #[clap(long)]
   once: bool,
+  /// Deprecated CIDRs, repeat to provide multiple
+  #[clap(long, short)]
+  deprecated: Option<Vec<Ipv4Net>>,
 }
 
 #[derive(Debug, Clone)]
@@ -56,11 +60,11 @@ impl App {
 }
 
 fn parse_key_val(s: &str) -> Result<(String, Ipv4Net), String> {
-  let pos = s.find('=').ok_or_else(|| format!("no `=` found in `{}`", s))?;
+  let pos = s.find('=').ok_or("no name found for cidr mapping")?;
 
   let key = s[..pos].to_string();
   if key.contains(':') {
-    return Err(format!("colon (:) not allowed in cidr name `{}`", key));
+    return Err("colon (:) not allowed in cidr name".to_string());
   }
 
   Ok((key, s[pos + 1..].parse().map_err(|_| "invalid CIDR")?))
