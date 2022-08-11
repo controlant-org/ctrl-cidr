@@ -13,7 +13,7 @@ env_logger = "0.9"
 ipnet = "2"
 
 # AWS
-aws-types = "0.13"
+aws-types = "0.47"
 aws-config = "0.13"
 aws-sdk-ec2 = "0.13"
 aws-sdk-eks = "0.13"
