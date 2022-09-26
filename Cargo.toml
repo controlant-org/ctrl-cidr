@@ -15,7 +15,7 @@ ipnet = "2"
 # AWS
 aws-types = "0.48"
 aws-config = "0.48"
-aws-sdk-ec2 = "0.18"
+aws-sdk-ec2 = "0.19"
 aws-sdk-eks = "0.18"
 
 # Runtime
