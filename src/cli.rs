@@ -7,7 +7,7 @@ use std::collections::HashMap;
 struct Cli {
   /// CIDR maps, format is [name]=[cidr], repeat to provide multiple mappings, cidrs with the same name will be grouped together, name cannot contain colon (:)
   // TODO: allow no cidr, thus the controller only handles cleanup
-  #[clap(long, short, parse(try_from_str = parse_key_val), required(true), value_name="[name]=[cidr]")]
+  #[clap(long, short, value_parser = parse_key_val, required(true), value_name="[name]=[cidr]")]
   cidr: Vec<(String, Ipv4Net)>,
   /// AWS IAM roles to assume, repeat to list all accounts to manage. If not specified, simply loads the current environment/account.
   #[clap(long, short)]
@@ -24,6 +24,12 @@ struct Cli {
   /// Deprecated CIDRs, repeat to provide multiple
   #[clap(long, short)]
   deprecated: Option<Vec<Ipv4Net>>,
+}
+
+#[test]
+fn verify_cli() {
+  use clap::CommandFactory;
+  Cli::command().debug_assert()
 }
 
 #[derive(Debug, Clone)]

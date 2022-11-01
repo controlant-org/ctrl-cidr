@@ -156,7 +156,7 @@ pub async fn run(config: &SdkConfig, app: &App) -> Result<()> {
               info!("update cluser result: {:?}", resp);
             }
           } else {
-            debug!("no updates needed for  EKS cluster {}", cluster_name);
+            debug!("no updates needed for EKS cluster {}", cluster_name);
           }
         }
       }
