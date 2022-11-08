@@ -23,13 +23,8 @@ jobs:
             /usr/share/rust/.rustup/
           key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo build --release
       - uses: docker/login-action@v2.1.0
         with:
           registry: ${{ env.REGISTRY }}
