@@ -15,7 +15,7 @@ clap = { version = "4", default-features = false, features = [
   "error-context",
 ] }
 log = "0.4"
-env_logger = "0.9"
+env_logger = "0.10"
 ipnet = "2"
 
 # AWS
