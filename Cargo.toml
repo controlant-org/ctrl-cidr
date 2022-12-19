@@ -20,7 +20,7 @@ ipnet = "2"
 
 # AWS
 aws-types = "0.51"
-aws-config = "0.51"
+aws-config = "0.52"
 aws-sdk-ec2 = "0.21"
 aws-sdk-eks = "0.21"
 
