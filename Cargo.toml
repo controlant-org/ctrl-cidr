@@ -15,14 +15,14 @@ clap = { version = "4", default-features = false, features = [
   "error-context",
 ] }
 log = "0.4"
-env_logger = "0.9"
+env_logger = "0.10"
 ipnet = "2"
 
 # AWS
-aws-types = "0.51"
-aws-config = "0.51"
-aws-sdk-ec2 = "0.21"
-aws-sdk-eks = "0.21"
+aws-types = "0.52"
+aws-config = "0.52"
+aws-sdk-ec2 = "0.22"
+aws-sdk-eks = "0.22"
 
 # Runtime
 tokio = { version = "1", features = ["full"] }
