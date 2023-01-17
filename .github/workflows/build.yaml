@@ -35,7 +35,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       - uses: docker/build-push-action@v3.2.0
-        if: github.ref_name == 'master'
+        if: github.event_name != 'pull_request'
         with:
           context: .
           push: true
