@@ -43,6 +43,6 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: .
-          push: ! (github.ref_type == 'branch' && github.ref_name != 'master')
+          push: ${{ ! (github.ref_type == 'branch' && github.ref_name != 'master') }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
