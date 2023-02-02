@@ -38,10 +38,14 @@ async fn main() -> Result<()> {
           tokio::spawn(async move {
             let provider = AssumeRoleProvider::builder(role)
               .session_name("ctrl-cidr")
-              .region(region)
+              .region(region.clone())
               .build(Arc::new(DefaultCredentialsChain::builder().build().await) as Arc<_>);
 
-            let config = aws_config::from_env().credentials_provider(provider).load().await;
+            let config = aws_config::from_env()
+              .credentials_provider(provider)
+              .region(region)
+              .load()
+              .await;
             controller::run(&config, &app).await.unwrap();
           })
         })
