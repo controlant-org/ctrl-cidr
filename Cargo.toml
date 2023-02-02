@@ -17,13 +17,14 @@ clap = { version = "4", default-features = false, features = [
 log = "0.4"
 env_logger = "0.10"
 ipnet = "2"
-
-# AWS
-aws-types = "0.53"
-aws-config = "0.53"
-aws-sdk-ec2 = "0.23"
-aws-sdk-eks = "0.23"
+itertools = "0.10"
 
 # Runtime
 tokio = { version = "1", features = ["full"] }
 tokio-stream = "0.1"
+
+# AWS
+aws-types = "0.54"
+aws-config = "0.54"
+aws-sdk-ec2 = "0.24"
+aws-sdk-eks = "0.24"

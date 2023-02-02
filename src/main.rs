@@ -1,4 +1,5 @@
 use anyhow::Result;
+use itertools::Itertools;
 use log::trace;
 use std::time::Duration;
 use tokio::time::sleep;
@@ -14,6 +15,10 @@ async fn main() -> Result<()> {
 
   loop {
     let base_aws_config = aws_config::load_from_env().await;
+    let regions = app
+      .regions
+      .clone()
+      .unwrap_or(vec![base_aws_config.region().unwrap().clone()]);
 
     if let Some(ref assume_roles) = app.assume_roles {
       trace!("assume roles: {:?}", assume_roles);
@@ -24,10 +29,11 @@ async fn main() -> Result<()> {
 
       let tasks: Vec<_> = assume_roles
         .iter()
-        .map(|role| {
+        .cartesian_product(regions.iter())
+        .map(|(role, region)| {
           let role = role.clone();
           let app = app.clone();
-          let region = base_aws_config.region().unwrap().clone();
+          let region = region.clone();
 
           tokio::spawn(async move {
             let provider = AssumeRoleProvider::builder(role)
@@ -45,6 +51,7 @@ async fn main() -> Result<()> {
         t.await?;
       }
     } else {
+      // TODO: make local multi-region work
       controller::run(&base_aws_config, &app).await?;
     }
 

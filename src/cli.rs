@@ -1,3 +1,4 @@
+use aws_types::region::Region;
 use clap::Parser;
 use ipnet::Ipv4Net;
 use std::collections::HashMap;
@@ -12,6 +13,9 @@ struct Cli {
   /// AWS IAM roles to assume, repeat to list all accounts to manage. If not specified, simply loads the current environment/account.
   #[clap(long, short)]
   assume: Option<Vec<String>>,
+  /// AWS regions to manage, repeat to list all regions to manage. If not specified, simply loads the current region.
+  #[clap(long, short)]
+  region: Option<Vec<String>>,
   /// The tag "key" to use for ingress rules
   #[clap(long, short, default_value = "ingress.controlant.com")]
   ingress_key: String,
@@ -37,6 +41,7 @@ fn verify_cli() {
 pub struct App {
   pub cidrs: HashMap<String, Vec<Ipv4Net>>,
   pub assume_roles: Option<Vec<String>>,
+  pub regions: Option<Vec<Region>>,
   pub ingress_sources: String,
   pub ingress_ports: String,
   // pub egress_sources: String,
@@ -55,6 +60,11 @@ impl App {
     Self {
       cidrs,
       assume_roles: cli.assume,
+      regions: cli.region.map(|rs| {
+        rs.iter()
+          .map(|x| aws_types::region::Region::new(x.clone()))
+          .collect::<Vec<_>>()
+      }),
       ingress_sources: format!("{}/sources", cli.ingress_key),
       ingress_ports: format!("{}/ports", cli.ingress_key),
       // egress_sources: format!("{}/sources", cli.egress_key),
