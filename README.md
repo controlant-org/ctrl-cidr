@@ -47,7 +47,7 @@ To deprecate CIDRs:
 # Roadmap
 
 - TODO: metrics
-- TODO: use distributed tracing (probably helps with async as well)
+- TODO: use distributed tracing
 - TODO: more tests
 - MAYBE: implement egress control
 - MAYBE: implement a "statefile" for better cleanup tracking

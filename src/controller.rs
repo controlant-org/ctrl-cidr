@@ -1,6 +1,6 @@
 use anyhow::Result;
-use aws_sdk_ec2::model::{Filter, IpPermission, IpRange, Tag};
-use aws_sdk_eks::model::VpcConfigRequest;
+use aws_sdk_ec2::types::{Filter, IpPermission, IpRange, Tag};
+use aws_sdk_eks::types::VpcConfigRequest;
 use aws_types::sdk_config::SdkConfig;
 use log::{debug, info, trace};
 use tokio_stream::StreamExt;
