@@ -102,9 +102,9 @@ dependencies = [
 
 [[package]]
 name = "aws-sdk-ec2"
-version = "0.25.0"
+version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd180c0cb50c9b4306288a9c67f51a0e252ce09f05462b34a437b8b37107982e"
+checksum = "9f9d53395ddad7cb7997d2fcd1eeceab970ad5bbb8f1529e651d5efd3df5782a"
 dependencies = [
  "aws-credential-types",
  "aws-endpoint",
