@@ -17,7 +17,7 @@ clap = { version = "4", default-features = false, features = [
 log = "0.4"
 env_logger = "0.10"
 ipnet = "2"
-itertools = "0.10"
+itertools = "0.11"
 
 # Runtime
 tokio = { version = "1", features = ["full"] }
