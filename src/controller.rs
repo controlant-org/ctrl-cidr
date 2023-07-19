@@ -14,8 +14,15 @@ const CONTROLLER_MARKER: &str = "manager:ctrl-cidr";
 type Sources = Vec<String>;
 type PortProtocols = Vec<(i32, String)>;
 
-pub async fn run(config: &SdkConfig, app: &App) -> Result<()> {
+pub async fn run(config: SdkConfig, app: &App) -> Result<()> {
   trace!("aws env: {:?}", &config);
+
+  // ignore non-existing role
+  let sts = aws_sdk_sts::Client::new(&config);
+  if let Err(e) = sts.get_caller_identity().send().await {
+    info!("ignore failed assume role: {:?}", e);
+    return Ok(());
+  }
 
   // EC2 Security Groups
   let ec2 = aws_sdk_ec2::Client::new(&config);

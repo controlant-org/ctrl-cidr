@@ -44,25 +44,9 @@ To deprecate CIDRs:
   - in the future we have plan to use a "statefile" to track these
 - Due to permission concerns, to opt-out of all CIDR mappings, a resource should not directly remove the tags, but only set the value to empty (e.g. `ingress/sources=`) after an update cycle, the tags can be deleted if so desired
 
-# Roadmap
+## IAM policy (in Terraform)
 
-- TODO: metrics
-- TODO: use distributed tracing
-- TODO: more tests
-- MAYBE: implement egress control
-- MAYBE: implement a "statefile" for better cleanup tracking
-- MAYBE: support ipv6
-- MAYBE: manage VPC ACLs
-
-# Debug
-
-- `RUST_LOG=trace` will enable all logs including those from AWS SDK
-- `RUST_LOG=ctrl_cidr=debug` will enable only debug+ logs from the controller, these include all read api calls and no action decisions
-- info logs include all update decisions and write api call results
-
-# IAM policy (in Terraform)
-
-Note: change the `[ingress_key]` below:
+Note: change the `INGRESS_KEY` below:
 
 ```hcl
 data "aws_iam_policy_document" "perms" {
@@ -77,7 +61,7 @@ data "aws_iam_policy_document" "perms" {
 
     condition {
       test     = "Null"
-      variable = "aws:ResourceTag/[ingress_key]/sources"
+      variable = "aws:ResourceTag/INGRESS_KEY/sources"
       values   = ["false"]
     }
   }
@@ -95,3 +79,23 @@ data "aws_iam_policy_document" "perms" {
   }
 }
 ```
+
+### Discovery
+
+TODO
+
+# Roadmap
+
+- TODO: add metrics
+- TODO: use distributed tracing
+- TODO: more tests
+- MAYBE: implement egress control
+- MAYBE: implement a "statefile" for automated cleanup (remove `--deprecate`)
+- MAYBE: support ipv6
+- MAYBE: manage VPC ACLs
+
+# Debug
+
+- `RUST_LOG=trace` will enable all logs including those from AWS SDK
+- `RUST_LOG=warn,ctrl_cidr=debug` will enable debug+ logs from the controller (these include all read api calls and no action decisions) as well as warn+ logs from other crates
+- info logs include all update decisions and write api call results
