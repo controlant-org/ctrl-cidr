@@ -1,5 +1,6 @@
 use anyhow::Result;
 use aws_config::{default_provider::credentials::DefaultCredentialsChain, sts::AssumeRoleProvider};
+use aws_types::region::Region;
 use log::trace;
 use std::sync::Arc;
 use std::time::Duration;
@@ -17,10 +18,12 @@ async fn main() -> Result<()> {
 
   loop {
     let base_aws_config = aws_config::load_from_env().await;
-    let regions = app.regions.clone().unwrap_or(vec![base_aws_config
+    let base_region = base_aws_config
       .region()
       .expect("failed to find the current AWS region")
-      .to_owned()]);
+      .to_owned();
+
+    let regions = app.regions.clone().unwrap_or(vec![base_region.clone()]);
 
     let mut work = JoinSet::new();
 
@@ -61,7 +64,8 @@ async fn main() -> Result<()> {
         }
       }
       AuthMode::Discover(ref root_role, ref sub_role) => {
-        let accounts = discover_accounts(root_role).await?;
+        let accounts = discover_accounts(root_role, base_region).await?;
+
         for acc in accounts.iter().take(1) {
           for region in regions.iter() {
             let app = app.clone();
@@ -102,14 +106,19 @@ async fn main() -> Result<()> {
   Ok(())
 }
 
-async fn discover_accounts(root_role: &Option<String>) -> Result<Vec<String>> {
+async fn discover_accounts(root_role: &Option<String>, region: Region) -> Result<Vec<String>> {
   let config = match root_role {
     Some(root_role) => {
       let provider = AssumeRoleProvider::builder(root_role)
         .session_name("ctrl-cidr")
+        .region(region.clone())
         .build(Arc::new(DefaultCredentialsChain::builder().build().await) as Arc<_>);
 
-      aws_config::from_env().credentials_provider(provider).load().await
+      aws_config::from_env()
+        .credentials_provider(provider)
+        .region(region)
+        .load()
+        .await
     }
     None => aws_config::load_from_env().await,
   };
