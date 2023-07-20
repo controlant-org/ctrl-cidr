@@ -66,7 +66,7 @@ async fn main() -> Result<()> {
       AuthMode::Discover(ref root_role, ref sub_role) => {
         let accounts = discover_accounts(root_role, base_region).await?;
 
-        for acc in accounts.iter().take(1) {
+        for acc in accounts.iter() {
           for region in regions.iter() {
             let app = app.clone();
             // MAYBE: support aws partition
