@@ -19,9 +19,17 @@ pub async fn run(config: SdkConfig, app: &App) -> Result<()> {
 
   // ignore non-existing role
   let sts = aws_sdk_sts::Client::new(&config);
-  if let Err(e) = sts.get_caller_identity().send().await {
-    info!("ignore failed assume role: {:?}", e);
-    return Ok(());
+  match sts.get_caller_identity().send().await {
+    Ok(acc) => {
+      info!(
+        "working on account: {}",
+        acc.account().expect("failed to extract account id")
+      );
+    }
+    Err(e) => {
+      debug!("ignore failed assume role: {:?}", e);
+      return Ok(());
+    }
   }
 
   // EC2 Security Groups
@@ -127,6 +135,7 @@ pub async fn run(config: SdkConfig, app: &App) -> Result<()> {
     debug!("working on EKS cluster: {}", cluster_name);
 
     if let Some(cluster) = eks.describe_cluster().name(cluster_name).send().await?.cluster {
+      // TODO: handle CIDR deprecations
       let mut public_access_cidrs = cluster.resources_vpc_config.unwrap().public_access_cidrs.unwrap();
       let old_len = public_access_cidrs.len();
 
