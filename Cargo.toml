@@ -24,7 +24,7 @@ tokio-stream = "0.1"
 
 # AWS
 aws-types = "0.55"
-aws-config = "0.55"
+aws-config = "0.56"
 aws-sdk-ec2 = "0.28"
 aws-sdk-eks = "0.28"
 aws-sdk-organizations = "0.28"
