@@ -31,9 +31,9 @@ struct Cli {
   /// Run controller logic just once, instead of running as a service
   #[clap(long)]
   once: bool,
-  /// Deprecated CIDRs, repeat to provide multiple
+  /// Deprecate CIDRs, repeat to provide multiple
   #[clap(long, short)]
-  deprecated: Option<Vec<Ipv4Net>>,
+  deprecate: Option<Vec<Ipv4Net>>,
 }
 
 #[test]
@@ -46,6 +46,7 @@ fn verify_cli() {
 #[non_exhaustive]
 pub struct App {
   pub cidrs: HashMap<String, Vec<Ipv4Net>>,
+  pub delete_cidrs: Vec<Ipv4Net>,
   pub auth_mode: AuthMode,
   pub regions: Option<Vec<Region>>,
   pub ingress_sources: String,
@@ -82,6 +83,7 @@ impl App {
 
     Self {
       cidrs,
+      delete_cidrs: cli.deprecate.unwrap_or_default(),
       auth_mode,
       regions: cli.region.map(|rs| {
         rs.iter()

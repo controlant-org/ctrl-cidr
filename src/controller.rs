@@ -3,6 +3,7 @@ use aws_sdk_ec2::types::{Filter, IpPermission, IpRange, Tag};
 use aws_sdk_eks::types::VpcConfigRequest;
 use aws_types::sdk_config::SdkConfig;
 use log::{debug, info, trace};
+use std::collections::HashSet;
 use tokio_stream::StreamExt;
 
 use crate::cli::App;
@@ -135,24 +136,41 @@ pub async fn run(config: SdkConfig, app: &App) -> Result<()> {
     debug!("working on EKS cluster: {}", cluster_name);
 
     if let Some(cluster) = eks.describe_cluster().name(cluster_name).send().await?.cluster {
-      // TODO: handle CIDR deprecations
-      let mut public_access_cidrs = cluster.resources_vpc_config.unwrap().public_access_cidrs.unwrap();
-      let old_len = public_access_cidrs.len();
-
-      debug!("current cluster public access CIDRs: {:?}", &public_access_cidrs);
-
       if let Some(tags) = cluster.tags {
         if let Some(sources) = tags.get(&app.ingress_sources) {
+          let mut public_access_cidrs = cluster
+            .resources_vpc_config
+            .unwrap()
+            .public_access_cidrs
+            .unwrap()
+            .into_iter()
+            .collect::<HashSet<_>>();
+
+          debug!("current cluster public access CIDRs: {:?}", &public_access_cidrs);
+
+          let mut modified = false;
+
           sources.split(':').for_each(|k| {
             if let Some(cidrs) = app.cidrs.get(k) {
-              cidrs.iter().for_each(|cidr| public_access_cidrs.push(cidr.to_string()));
+              cidrs.iter().for_each(|cidr| {
+                let c = cidr.to_string();
+                if !public_access_cidrs.contains(&c) {
+                  modified = true;
+                  public_access_cidrs.insert(c);
+                }
+              });
             }
           });
 
-          public_access_cidrs.sort(); // needed for dedup
-          public_access_cidrs.dedup();
+          for cidr in app.delete_cidrs.iter() {
+            let c = cidr.to_string();
+            if public_access_cidrs.contains(&c) {
+              modified = true;
+              public_access_cidrs.remove(&c);
+            }
+          }
 
-          if public_access_cidrs.len() > old_len {
+          if modified {
             info!("new cluster public access CIDRs: {:?}", &public_access_cidrs);
 
             if app.dry_run {
@@ -163,7 +181,7 @@ pub async fn run(config: SdkConfig, app: &App) -> Result<()> {
                 .name(cluster_name)
                 .resources_vpc_config(
                   VpcConfigRequest::builder()
-                    .set_public_access_cidrs(Some(public_access_cidrs))
+                    .set_public_access_cidrs(Some(public_access_cidrs.into_iter().collect()))
                     .build(),
                 )
                 .send()
