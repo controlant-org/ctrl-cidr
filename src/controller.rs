@@ -2,7 +2,7 @@ use anyhow::Result;
 use aws_sdk_ec2::types::{Filter, IpPermission, IpRange, Tag};
 use aws_sdk_eks::types::VpcConfigRequest;
 use aws_types::sdk_config::SdkConfig;
-use log::{debug, info, trace};
+use log::{debug, info, trace, warn};
 use std::collections::HashSet;
 use tokio_stream::StreamExt;
 
@@ -171,12 +171,15 @@ pub async fn run(config: SdkConfig, app: &App) -> Result<()> {
           }
 
           if modified {
-            info!("new cluster public access CIDRs: {:?}", &public_access_cidrs);
+            info!(
+              "updating cluster {:?} public access CIDRs: {:?}",
+              cluster.arn, &public_access_cidrs
+            );
 
             if app.dry_run {
               info!("dry run: not updating cluster public access CIDRs");
             } else {
-              let resp = eks
+              match eks
                 .update_cluster_config()
                 .name(cluster_name)
                 .resources_vpc_config(
@@ -185,9 +188,15 @@ pub async fn run(config: SdkConfig, app: &App) -> Result<()> {
                     .build(),
                 )
                 .send()
-                .await?;
-
-              info!("update cluser result: {:?}", resp);
+                .await
+              {
+                Ok(_) => {
+                  info!("updated cluser: {:?}", cluster.arn);
+                }
+                Err(e) => {
+                  warn!("failed to update cluster: {:?}", e);
+                }
+              }
             }
           } else {
             debug!("no updates needed for EKS cluster {}", cluster_name);
