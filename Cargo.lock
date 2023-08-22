@@ -604,7 +604,7 @@ dependencies = [
 
 [[package]]
 name = "ctrl-cidr"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "anyhow",
  "aws-config",
