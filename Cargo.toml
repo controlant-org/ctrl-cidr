@@ -1,6 +1,6 @@
 [package]
 name = "ctrl-cidr"
-version = "0.6.1"
+version = "0.6.2"
 authors = ["LOU Xun <xun.lou@controlant.com>"]
 description = "CIDR rules controller for AWS networking"
 edition = "2021"
@@ -25,7 +25,7 @@ tokio-stream = "0.1"
 # AWS
 aws-types = "0.56"
 aws-config = "0.56"
-aws-sdk-ec2 = "0.29"
-aws-sdk-eks = "0.29"
-aws-sdk-organizations = "0.29"
-aws-sdk-sts = "0.29"
+aws-sdk-ec2 = "0.30"
+aws-sdk-eks = "0.30"
+aws-sdk-organizations = "0.30"
+aws-sdk-sts = "0.30"

@@ -6,6 +6,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::task::JoinSet;
 use tokio::time::sleep;
+use tokio_stream::StreamExt;
 
 mod cli;
 mod controller;
@@ -124,16 +125,18 @@ async fn discover_accounts(root_role: &Option<String>, region: Region) -> Result
   };
 
   let org = aws_sdk_organizations::Client::new(&config);
+  let mut lc_stream = org.list_accounts().into_paginator().send();
 
-  Ok(
-    org
-      .list_accounts()
-      .send()
-      .await?
-      .accounts()
-      .expect("failed to list accounts")
+  let mut accounts = Vec::new();
+  while let Some(p) = lc_stream.next().await {
+    p.expect("failed to list accounts")
+      .accounts
+      .expect("failed to extract accounts")
       .into_iter()
-      .map(|a| a.id().expect("failed to extract account ID").to_string())
-      .collect(),
-  )
+      .for_each(|a| {
+        accounts.push(a.id.expect("failed to extract account ID"));
+      });
+  }
+
+  Ok(accounts)
 }
