@@ -156,9 +156,9 @@ dependencies = [
 
 [[package]]
 name = "aws-sdk-eks"
-version = "0.31.1"
+version = "0.33.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a44b9aee30a6a581cf5e7a97b16ba96b1cd1b831b5b3ab4d087563b8059eaf2"
+checksum = "0545193007f158a09318821920883aa03a27750d917f034083030d1f839d5902"
 dependencies = [
  "aws-credential-types",
  "aws-http",
