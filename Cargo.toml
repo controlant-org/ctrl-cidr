@@ -1,6 +1,6 @@
 [package]
 name = "ctrl-cidr"
-version = "0.6.2"
+version = "0.7.0"
 authors = ["LOU Xun <xun.lou@controlant.com>"]
 description = "CIDR rules controller for AWS networking"
 edition = "2021"
@@ -17,15 +17,16 @@ clap = { version = "4", default-features = false, features = [
 log = "0.4"
 env_logger = "0.10"
 ipnet = "2"
+fastrand = "2"
 
 # Runtime
 tokio = { version = "1", features = ["full"] }
-tokio-stream = "0.1"
 
 # AWS
-aws-types = "0.56"
-aws-config = "0.56"
-aws-sdk-ec2 = "0.33"
-aws-sdk-eks = "0.33"
-aws-sdk-organizations = "0.33"
-aws-sdk-sts = "0.33"
+control-aws = { git = "https://github.com/controlant-org/control-aws.git", rev = "f0ceea7" }
+aws-config = { version = "0.100", features = ["behavior-version-latest"] }
+aws-types = "0.100"
+aws-sdk-ec2 = "0.37"
+aws-sdk-eks = "0.37"
+aws-sdk-organizations = "0.37"
+aws-sdk-sts = "0.37"

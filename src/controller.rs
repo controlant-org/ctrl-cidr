@@ -4,7 +4,6 @@ use aws_sdk_eks::types::VpcConfigRequest;
 use aws_types::sdk_config::SdkConfig;
 use log::{debug, info, trace, warn};
 use std::collections::HashSet;
-use tokio_stream::StreamExt;
 
 use crate::cli::App;
 

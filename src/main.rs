@@ -1,12 +1,8 @@
 use anyhow::Result;
-use aws_config::{default_provider::credentials::DefaultCredentialsChain, sts::AssumeRoleProvider};
-use aws_types::region::Region;
 use log::trace;
-use std::sync::Arc;
 use std::time::Duration;
 use tokio::task::JoinSet;
 use tokio::time::sleep;
-use tokio_stream::StreamExt;
 
 mod cli;
 mod controller;
@@ -44,50 +40,33 @@ async fn main() -> Result<()> {
         for role in roles {
           for region in regions.iter() {
             let app = app.clone();
-            let role = role.clone();
-            let region = region.clone();
+            let config = control_aws::assume_role(role, Some(region.clone())).await;
 
-            work.spawn(async move {
-              let provider = AssumeRoleProvider::builder(role)
-                .session_name("ctrl-cidr")
-                .region(region.clone())
-                .build(Arc::new(DefaultCredentialsChain::builder().build().await) as Arc<_>);
-
-              let config = aws_config::from_env()
-                .credentials_provider(provider)
-                .region(region)
-                .load()
-                .await;
-
-              controller::run(config, &app).await
-            });
+            work.spawn(async move { controller::run(config, &app).await });
           }
         }
       }
       AuthMode::Discover(ref root_role, ref sub_role) => {
-        let accounts = discover_accounts(root_role, base_region).await?;
+        let root_config = match root_role {
+          Some(r) => control_aws::assume_role(r, None).await,
+          None => aws_config::from_env().load().await,
+        };
+        match control_aws::org::discover_accounts(root_config).await {
+          Ok(accounts) => {
+            for acc in accounts {
+              for region in regions.iter() {
+                let app = app.clone();
+                // MAYBE: support aws partition
+                let role = format!("arn:aws:iam::{}:role{}", acc.id, sub_role);
+                let config = control_aws::assume_role(&role, Some(region.clone())).await;
 
-        for acc in accounts.iter() {
-          for region in regions.iter() {
-            let app = app.clone();
-            // MAYBE: support aws partition
-            let role = format!("arn:aws:iam::{}:role{}", acc, sub_role);
-            let region = region.clone();
-
-            work.spawn(async move {
-              let provider = AssumeRoleProvider::builder(role)
-                .session_name("ctrl-cidr")
-                .region(region.clone())
-                .build(Arc::new(DefaultCredentialsChain::builder().build().await) as Arc<_>);
-
-              let config = aws_config::from_env()
-                .credentials_provider(provider)
-                .region(region)
-                .load()
-                .await;
-
-              controller::run(config, &app).await
-            });
+                work.spawn(async move { controller::run(config, &app).await });
+              }
+            }
+          }
+          Err(e) => {
+            println!("Failed to fetch accounts: {}", e);
+            sleep(Duration::from_secs(fastrand::u64(60..300))).await;
           }
         }
       }
@@ -105,38 +84,4 @@ async fn main() -> Result<()> {
   }
 
   Ok(())
-}
-
-async fn discover_accounts(root_role: &Option<String>, region: Region) -> Result<Vec<String>> {
-  let config = match root_role {
-    Some(root_role) => {
-      let provider = AssumeRoleProvider::builder(root_role)
-        .session_name("ctrl-cidr")
-        .region(region.clone())
-        .build(Arc::new(DefaultCredentialsChain::builder().build().await) as Arc<_>);
-
-      aws_config::from_env()
-        .credentials_provider(provider)
-        .region(region)
-        .load()
-        .await
-    }
-    None => aws_config::load_from_env().await,
-  };
-
-  let org = aws_sdk_organizations::Client::new(&config);
-  let mut lc_stream = org.list_accounts().into_paginator().send();
-
-  let mut accounts = Vec::new();
-  while let Some(p) = lc_stream.next().await {
-    p.expect("failed to list accounts")
-      .accounts
-      .expect("failed to extract accounts")
-      .into_iter()
-      .for_each(|a| {
-        accounts.push(a.id.expect("failed to extract account ID"));
-      });
-  }
-
-  Ok(accounts)
 }
