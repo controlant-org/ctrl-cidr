@@ -1,7 +1,7 @@
 use anyhow::Result;
 use aws_sdk_ec2::types::{Filter, IpPermission, IpRange, Tag};
 use aws_sdk_eks::types::VpcConfigRequest;
-use aws_types::sdk_config::SdkConfig;
+use aws_config::SdkConfig;
 use log::{debug, info, trace, warn};
 use std::collections::HashSet;
 

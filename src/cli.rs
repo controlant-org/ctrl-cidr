@@ -1,4 +1,4 @@
-use aws_types::region::Region;
+use aws_config::Region;
 use clap::Parser;
 use ipnet::Ipv4Net;
 use std::collections::HashMap;
@@ -85,11 +85,9 @@ impl App {
       cidrs,
       delete_cidrs: cli.deprecate.unwrap_or_default(),
       auth_mode,
-      regions: cli.region.map(|rs| {
-        rs.iter()
-          .map(|x| aws_types::region::Region::new(x.clone()))
-          .collect::<Vec<_>>()
-      }),
+      regions: cli
+        .region
+        .map(|rs| rs.iter().map(|x| Region::new(x.clone())).collect::<Vec<_>>()),
       ingress_sources: format!("{}/sources", cli.ingress_key),
       ingress_ports: format!("{}/ports", cli.ingress_key),
       // egress_sources: format!("{}/sources", cli.egress_key),
