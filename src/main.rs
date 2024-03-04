@@ -7,7 +7,7 @@ use tokio::time::sleep;
 mod cli;
 mod controller;
 
-#[tokio::main]
+#[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
   env_logger::init();
   let app = cli::App::from_cli();
