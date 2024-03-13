@@ -51,7 +51,8 @@ async fn main() -> Result<()> {
           Some(r) => control_aws::assume_role(r, None).await,
           None => aws_config::from_env().load().await,
         };
-        match control_aws::org::discover_accounts(root_config).await {
+        let org_config = aws_sdk_organizations::Config::new(&root_config);
+        match control_aws::org::discover_accounts(org_config).await {
           Ok(accounts) => {
             for acc in accounts {
               for region in regions.iter() {
